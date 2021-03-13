@@ -128,6 +128,13 @@ const UsuarioSchema = new Schema(
         detalles: experienciaLaboral,
       },
     ],
+    skills: [
+      {
+        type: String,
+        required: true,
+        trim: true,
+      },
+    ],
     servicioSocial: {
       type: boolean,
       default: false,
