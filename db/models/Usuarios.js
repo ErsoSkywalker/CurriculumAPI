@@ -66,7 +66,7 @@ const UsuarioSchema = new Schema(
     },
     estado: {
       type: String,
-      default: "Regular",
+      default: "REGULAR",
       required: true,
       trim: true,
     },
