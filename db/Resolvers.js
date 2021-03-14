@@ -10,8 +10,8 @@ const crearToken = (usuario, secreta, expiresIn) => {
 const resolvers = {
   Query: {
     obtenerUsuario: async (_, { token }) => {
-      const usuarioId = await jwt.verify(token, process.env.SECRET);
-      return usuarioId;
+      const userInfo = await jwt.verify(token, process.env.SECRET);
+      return userInfo;
     },
   },
   Mutation: {
