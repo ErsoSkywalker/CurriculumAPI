@@ -31,7 +31,7 @@ const typeDefs = gql`
   }
 
   input InputContactoUsuario {
-    contacto: String!
+    contact: String!
     contactMethod: String!
   }
 
@@ -63,10 +63,9 @@ const typeDefs = gql`
   input InputTrayectoriaLaboralUsuario {
     empresa: String!
     ingreso: String!
-    egreso: String!
+    egreso: String
     puesto: String!
     descripcionActividades: String!
-    permaneceTrabajando: Boolean!
   }
 
   type QueryUsuario {
@@ -109,12 +108,24 @@ const typeDefs = gql`
   #Query
   type Query {
     obtenerUsuario(token: String!): Usuario
+    obtenerContactoUsuario: [ContactoUsuario]
+    obtenerTrayectoriaAcademicaUsuario: [TrayectoriaAcademicaUsuario]
+    obtenerTrayectoriaLaboralUsuario: [TrayectoriaLaboralUsuario]
+    obtenerSkillsUsuario: [String]
   }
 
   #Mutation
   type Mutation {
     nuevoUsuario(input: InputUsuario!): Usuario
     autenticarUsuario(input: AuthUsuario!): Token
+    agregarContactoUsuario(input: InputContactoUsuario!): [ContactoUsuario]
+    agregarTrayectoriaAcademica(
+      input: InputTrayectoriaAcademicaUsuario!
+    ): [TrayectoriaAcademicaUsuario]
+    agregarTrayectoriaLaboral(
+      input: InputTrayectoriaLaboralUsuario!
+    ): [TrayectoriaLaboralUsuario]
+    agregarSkills(input: String!): [String]
   }
 `;
 
