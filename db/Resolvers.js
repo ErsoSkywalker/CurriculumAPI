@@ -2,8 +2,8 @@ const Usuario = require("./models/Usuarios");
 const Reclutador = require("./models/Reclutador");
 const jwt = require("jsonwebtoken");
 const crearToken = (usuario, secreta, expiresIn) => {
-  const { id, email, nombre, apellido, numeroDeBoleta } = usuario;
-  return jwt.sign({ id, email, nombre, apellido, numeroDeBoleta }, secreta, {
+  const { id, email, nombre, apellido } = usuario;
+  return jwt.sign({ id, email, nombre, apellido }, secreta, {
     expiresIn,
   });
 };
@@ -41,6 +41,10 @@ const resolvers = {
         throw new Error("Tu usuario no existe");
       }
       return existeUsuario.skills;
+    },
+    obtenerReclutador: async (_, { token }) => {
+      const reclutadorInfo = await jwt.verify(token, process.env.SECRET);
+      return reclutadorInfo;
     },
   },
   Mutation: {
@@ -444,6 +448,99 @@ const resolvers = {
       return {
         token: crearToken(existeReclutador, process.env.SECRET, "24h"),
       };
+    },
+    agregarInteresReclutador: async (_, { input }, ctx) => {
+      const existeReclutador = await Reclutador.findById(ctx.user.id);
+      if (!existeReclutador) {
+        throw new Error("Ese reclutador no existe");
+      }
+
+      let existeInteres = false;
+      for await (const Interes of existeReclutador.intereses) {
+        if (Interes == input) {
+          existeInteres = true;
+        }
+      }
+
+      if (existeInteres) {
+        throw new Error("Ese interés ya existe");
+      }
+
+      existeReclutador.intereses.push(input);
+
+      const resultado = await Reclutador.findOneAndUpdate(
+        { _id: ctx.user.id },
+        existeReclutador,
+        { new: true }
+      );
+
+      return resultado.intereses;
+    },
+    eliminarInteresReclutador: async (_, { input }, ctx) => {
+      const existeReclutador = await Reclutador.findById(ctx.user.id);
+      if (!existeReclutador) {
+        throw new Error("Ese reclutador no existe");
+      }
+      for (let i = 0; i < existeReclutador.intereses.length; i++) {
+        if (existeReclutador.intereses[i] == input) {
+          existeReclutador.intereses.splice(i, 1);
+        }
+      }
+
+      const resultado = await Reclutador.findOneAndUpdate(
+        { _id: ctx.user.id },
+        existeReclutador,
+        { new: true }
+      );
+
+      return resultado.intereses;
+    },
+    crearContactoReclutador: async (_, { input }, ctx) => {
+      const existeReclutador = await Reclutador.findById(ctx.user.id);
+      if (!existeReclutador) {
+        throw new Error("Ese reclutador no existe");
+      }
+
+      let existeContacto = false;
+      for await (const contacto of existeReclutador.contacto) {
+        if (contacto.contact == input.contact) {
+          existeContacto = true;
+        }
+      }
+
+      if (existeContacto) {
+        throw new Error("Ese contacto ya existe");
+      }
+
+      existeReclutador.contacto.push(input);
+
+      const resultado = await Reclutador.findOneAndUpdate(
+        { _id: ctx.user.id },
+        existeReclutador,
+        { new: true }
+      );
+
+      return resultado.contacto;
+    },
+    eliminarContactoReclutador: async (_, { id }, ctx) => {
+      const existeReclutador = await Reclutador.findById(ctx.user.id);
+      if (!existeReclutador) {
+        throw new Error("Ese reclutador no existe");
+      }
+
+      for (let i = 0; i < existeReclutador.contacto.length; i++) {
+        if (existeReclutador.contacto[i]._id == id) {
+          existeReclutador.contacto.splice(i, 1);
+        }
+      }
+
+      const resultado = await Reclutador.findOneAndUpdate(
+        { _id: ctx.user.id },
+        existeReclutador,
+        { new: true }
+      );
+
+      return resultado.contacto;
     },
   },
 };

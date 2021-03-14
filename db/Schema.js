@@ -132,6 +132,7 @@ const typeDefs = gql`
     email: String
     empresa: String
     contacto: [ReclutadorContacto]
+    intereses: [String]
   }
 
   input ReclutadorInput {
@@ -147,6 +148,11 @@ const typeDefs = gql`
     password: String!
   }
 
+  input ReclutadorContactoInput {
+    contact: String!
+    contactMethod: enumContactMethod!
+  }
+
   #Query
   type Query {
     #Usuario
@@ -156,6 +162,7 @@ const typeDefs = gql`
     obtenerTrayectoriaLaboralUsuario: [TrayectoriaLaboralUsuario]
     obtenerSkillsUsuario: [String]
     #Reclutador
+    obtenerReclutador(token: String!): Reclutador
   }
 
   #Mutation
@@ -193,6 +200,12 @@ const typeDefs = gql`
     #Reclutador
     nuevoReclutador(input: ReclutadorInput!): Reclutador
     autenticarReclutador(input: AuthReclutador!): Token
+    agregarInteresReclutador(input: String!): [String]
+    eliminarInteresReclutador(input: String!): [String]
+    crearContactoReclutador(
+      input: ReclutadorContactoInput!
+    ): [ReclutadorContacto]
+    eliminarContactoReclutador(id: ID!): [ReclutadorContacto]
   }
 `;
 
