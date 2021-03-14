@@ -142,7 +142,7 @@ const UsuarioSchema = new Schema(
           required: true,
           trim: true,
         },
-        descipcionActividades: {
+        descripcionActividades: {
           type: String,
           required: true,
           trim: true,

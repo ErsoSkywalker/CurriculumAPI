@@ -201,6 +201,200 @@ const resolvers = {
       );
       return resultado.skills;
     },
+    eliminarContactoUsuario: async (_, { input }, ctx) => {
+      const existeUsuario = await Usuario.findById(ctx.user.id);
+      if (!existeUsuario) {
+        throw new Error("Tu usuario no existe");
+      }
+      for (let i = 0; i < existeUsuario.contacto.length; i++) {
+        if (existeUsuario.contacto[i]._id == input) {
+          existeUsuario.contacto.splice(i, 1);
+        }
+      }
+      const resultado = await Usuario.findOneAndUpdate(
+        { _id: ctx.user.id },
+        existeUsuario,
+        { new: true }
+      );
+      return resultado.contacto;
+    },
+    eliminarTrayectoriaAcademicaUsuario: async (_, { input }, ctx) => {
+      const existeUsuario = await Usuario.findById(ctx.user.id);
+      if (!existeUsuario) {
+        throw new Error("Tu usuario no existe");
+      }
+      for (let i = 0; i < existeUsuario.trayectoriaAcademica.length; i++) {
+        if (existeUsuario.trayectoriaAcademica[i]._id == input) {
+          existeUsuario.trayectoriaAcademica.splice(i, 1);
+        }
+      }
+      const resultado = await Usuario.findOneAndUpdate(
+        { _id: ctx.user.id },
+        existeUsuario,
+        { new: true }
+      );
+      return resultado.trayectoriaAcademica;
+    },
+    eliminarTrayectoriaLaboralUsuario: async (_, { input }, ctx) => {
+      const existeUsuario = await Usuario.findById(ctx.user.id);
+      if (!existeUsuario) {
+        throw new Error("Tu usuario no existe");
+      }
+      for (let i = 0; i < existeUsuario.trayectoriaLaboral.length; i++) {
+        if (existeUsuario.trayectoriaLaboral[i]._id == input) {
+          existeUsuario.trayectoriaLaboral.splice(i, 1);
+        }
+      }
+      const resultado = await Usuario.findOneAndUpdate(
+        { _id: ctx.user.id },
+        existeUsuario,
+        { new: true }
+      );
+      return resultado.trayectoriaLaboral;
+    },
+    eliminarSkillUsuario: async (_, { input }, ctx) => {
+      const existeUsuario = await Usuario.findById(ctx.user.id);
+      if (!existeUsuario) {
+        throw new Error("Tu usuario no existe");
+      }
+      for (let i = 0; i < existeUsuario.skills.length; i++) {
+        if (existeUsuario.skills[i] == input) {
+          existeUsuario.skills.splice(i, 1);
+        }
+      }
+      const resultado = await Usuario.findOneAndUpdate(
+        { _id: ctx.user.id },
+        existeUsuario,
+        { new: true }
+      );
+      return resultado.skills;
+    },
+    agregarFechaDeEgresoAcademica: async (_, { input, fecha }, ctx) => {
+      const existeUsuario = await Usuario.findById(ctx.user.id);
+      if (!existeUsuario) {
+        throw new Error("Tu usuario no existe");
+      }
+      for (let i = 0; i < existeUsuario.trayectoriaAcademica.length; i++) {
+        if (existeUsuario.trayectoriaAcademica[i]._id == input) {
+          existeUsuario.trayectoriaAcademica[i].egreso = fecha;
+        }
+      }
+      const resultado = await Usuario.findOneAndUpdate(
+        { _id: ctx.user.id },
+        existeUsuario,
+        { new: true }
+      );
+      return resultado.trayectoriaAcademica;
+    },
+    agregarFechaDeEgresoLaboral: async (_, { input, fecha }, ctx) => {
+      const existeUsuario = await Usuario.findById(ctx.user.id);
+      if (!existeUsuario) {
+        throw new Error("Tu usuario no existe");
+      }
+      for (let i = 0; i < existeUsuario.trayectoriaLaboral.length; i++) {
+        if (existeUsuario.trayectoriaLaboral[i]._id == input) {
+          existeUsuario.trayectoriaLaboral[i].egreso = fecha;
+          existeUsuario.trayectoriaLaboral[i].permaneceTrabajando = false;
+        }
+      }
+      const resultado = await Usuario.findOneAndUpdate(
+        { _id: ctx.user.id },
+        existeUsuario,
+        { new: true }
+      );
+      return resultado.trayectoriaLaboral;
+    },
+    cambiarPromedioUsuario: async (_, { promedio }, ctx) => {
+      const existeUsuario = await Usuario.findById(ctx.user.id);
+      if (!existeUsuario) {
+        throw new Error("Tu usuario no existe");
+      }
+
+      existeUsuario.academico.promedio = promedio;
+
+      const resultado = await Usuario.findOneAndUpdate(
+        { _id: ctx.user.id },
+        existeUsuario,
+        { new: true }
+      );
+      return resultado.academico;
+    },
+    cambiarEstadoUsuario: async (_, { estado }, ctx) => {
+      const existeUsuario = await Usuario.findById(ctx.user.id);
+      if (!existeUsuario) {
+        throw new Error("Tu usuario no existe");
+      }
+
+      existeUsuario.estado = estado;
+
+      const resultado = await Usuario.findOneAndUpdate(
+        { _id: ctx.user.id },
+        existeUsuario,
+        { new: true }
+      );
+      return resultado;
+    },
+    completarPracticasProfesionales: async (_, {}, ctx) => {
+      const existeUsuario = await Usuario.findById(ctx.user.id);
+      if (!existeUsuario) {
+        throw new Error("Tu usuario no existe");
+      }
+
+      existeUsuario.practicasProfesionales = true;
+
+      const resultado = await Usuario.findOneAndUpdate(
+        { _id: ctx.user.id },
+        existeUsuario,
+        { new: true }
+      );
+      return resultado;
+    },
+    completarServicioSocial: async (_, {}, ctx) => {
+      const existeUsuario = await Usuario.findById(ctx.user.id);
+      if (!existeUsuario) {
+        throw new Error("Tu usuario no existe");
+      }
+
+      existeUsuario.servicioSocial = true;
+
+      const resultado = await Usuario.findOneAndUpdate(
+        { _id: ctx.user.id },
+        existeUsuario,
+        { new: true }
+      );
+      return resultado;
+    },
+    editarUsuario: async (_, { input }, ctx) => {
+      const { nombre, apellido, email, password, passwordAntigua } = input;
+      const existeUsuario = await Usuario.findById(ctx.user.id);
+      if (!existeUsuario) {
+        throw new Error("Tu usuario no existe");
+      }
+
+      const passwordCorrecto = await existeUsuario.matchPassword(
+        passwordAntigua,
+        existeUsuario.password
+      );
+
+      if (!passwordCorrecto) {
+        throw new Error("Combinación incorrecta");
+      }
+
+      existeUsuario.nombre = nombre;
+      existeUsuario.apellido = apellido;
+      existeUsuario.email = email;
+      existeUsuario.password = await existeUsuario.encryptPassword(password);
+
+      const resultado = await Usuario.findOneAndUpdate(
+        { _id: ctx.user.id },
+        existeUsuario,
+        { new: true }
+      );
+
+      return {
+        token: crearToken(resultado, process.env.SECRET, "24h"),
+      };
+    },
   },
 };
 

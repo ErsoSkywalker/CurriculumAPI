@@ -46,7 +46,7 @@ const typeDefs = gql`
   input InputTrayectoriaAcademicaUsuario {
     escuela: String!
     ingreso: String!
-    egreso: String!
+    egreso: String
     nivel: String!
   }
 
@@ -91,13 +91,21 @@ const typeDefs = gql`
     busquedas: [QueryUsuario]
   }
 
+  input InputEditarUsuario {
+    nombre: String!
+    apellido: String!
+    email: String!
+    password: String!
+    passwordAntigua: String!
+  }
+
   input InputUsuario {
     nombre: String!
     apellido: String!
     email: String!
     password: String!
     numeroDeBoleta: Int!
-    estado: String!
+    estado: EstadoEnum!
     promedio: Float!
     carrera: String!
     unidadAcademica: String!
@@ -126,6 +134,25 @@ const typeDefs = gql`
       input: InputTrayectoriaLaboralUsuario!
     ): [TrayectoriaLaboralUsuario]
     agregarSkills(input: String!): [String]
+    eliminarContactoUsuario(input: ID!): [ContactoUsuario]
+    eliminarTrayectoriaAcademicaUsuario(
+      input: ID!
+    ): [TrayectoriaAcademicaUsuario]
+    eliminarTrayectoriaLaboralUsuario(input: ID!): [TrayectoriaLaboralUsuario]
+    eliminarSkillUsuario(input: String!): [String]
+    agregarFechaDeEgresoAcademica(
+      input: ID!
+      fecha: String!
+    ): [TrayectoriaAcademicaUsuario]
+    agregarFechaDeEgresoLaboral(
+      input: ID!
+      fecha: String!
+    ): [TrayectoriaLaboralUsuario]
+    cambiarPromedioUsuario(promedio: Float!): AcademicoUsuario
+    cambiarEstadoUsuario(estado: EstadoEnum!): Usuario
+    completarPracticasProfesionales: Usuario
+    completarServicioSocial: Usuario
+    editarUsuario(input: InputEditarUsuario!): Token
   }
 `;
 
