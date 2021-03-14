@@ -53,11 +53,9 @@ const ReclutadorSchema = new Schema(
     ],
     intereses: [
       {
-        interes: {
-          type: String,
-          required: true,
-          trim: true,
-        },
+        type: String,
+        required: true,
+        trim: true,
       },
     ],
   },

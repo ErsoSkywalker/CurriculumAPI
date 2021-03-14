@@ -1,4 +1,5 @@
 const Usuario = require("./models/Usuarios");
+const Reclutador = require("./models/Reclutador");
 const jwt = require("jsonwebtoken");
 const crearToken = (usuario, secreta, expiresIn) => {
   const { id, email, nombre, apellido, numeroDeBoleta } = usuario;
@@ -393,6 +394,55 @@ const resolvers = {
 
       return {
         token: crearToken(resultado, process.env.SECRET, "24h"),
+      };
+    },
+    nuevoReclutador: async (_, { input }) => {
+      const { email, password } = input;
+      const existeReclutador = await Reclutador.findOne({ email });
+      if (existeReclutador) {
+        throw new Error("Este reclutador ya está registrado");
+      }
+
+      try {
+        const reclutadorGo = {
+          nombre: input.nombre,
+          apellido: input.apellido,
+          email: input.email,
+          password: input.password,
+          empresa: input.empresa,
+          contacto: [],
+          busquedas: [],
+          intereses: [],
+        };
+
+        const newReclutador = await Reclutador(reclutadorGo);
+        newReclutador.password = await newReclutador.encryptPassword(
+          newReclutador.password
+        );
+        newReclutador.save();
+        return newReclutador;
+      } catch (error) {
+        console.log(error);
+      }
+    },
+    autenticarReclutador: async (_, { input }) => {
+      const { email, password } = input;
+      const existeReclutador = await Reclutador.findOne({ email });
+      if (!existeReclutador) {
+        throw new Error("El reclutador no existe");
+      }
+
+      const passwordCorrecto = await existeReclutador.matchPassword(
+        password,
+        existeReclutador.password
+      );
+
+      if (!passwordCorrecto) {
+        throw new Error("Combinación incorrecta");
+      }
+
+      return {
+        token: crearToken(existeReclutador, process.env.SECRET, "24h"),
       };
     },
   },

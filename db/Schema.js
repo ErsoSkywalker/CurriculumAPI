@@ -11,6 +11,11 @@ const typeDefs = gql`
     password: String!
   }
 
+  enum enumContactMethod {
+    TELEFONO
+    MAIL
+  }
+
   #Usuario
   enum EstadoEnum {
     REGULAR
@@ -27,12 +32,12 @@ const typeDefs = gql`
   type ContactoUsuario {
     id: ID
     contact: String
-    contactMethod: String
+    contactMethod: enumContactMethod
   }
 
   input InputContactoUsuario {
     contact: String!
-    contactMethod: String!
+    contactMethod: enumContactMethod!
   }
 
   type TrayectoriaAcademicaUsuario {
@@ -78,7 +83,6 @@ const typeDefs = gql`
     nombre: String
     apellido: String
     email: String
-    password: String
     numeroDeBoleta: Int
     estado: EstadoEnum
     academico: AcademicoUsuario
@@ -113,17 +117,50 @@ const typeDefs = gql`
     practicasProfesionales: Boolean!
   }
 
+  #Reclutador
+
+  type ReclutadorContacto {
+    id: ID
+    contact: String
+    contactMethod: enumContactMethod
+  }
+
+  type Reclutador {
+    id: ID
+    nombre: String
+    apellido: String
+    email: String
+    empresa: String
+    contacto: [ReclutadorContacto]
+  }
+
+  input ReclutadorInput {
+    nombre: String!
+    apellido: String!
+    email: String!
+    password: String!
+    empresa: String!
+  }
+
+  input AuthReclutador {
+    email: String!
+    password: String!
+  }
+
   #Query
   type Query {
+    #Usuario
     obtenerUsuario(token: String!): Usuario
     obtenerContactoUsuario: [ContactoUsuario]
     obtenerTrayectoriaAcademicaUsuario: [TrayectoriaAcademicaUsuario]
     obtenerTrayectoriaLaboralUsuario: [TrayectoriaLaboralUsuario]
     obtenerSkillsUsuario: [String]
+    #Reclutador
   }
 
   #Mutation
   type Mutation {
+    #Usuario
     nuevoUsuario(input: InputUsuario!): Usuario
     autenticarUsuario(input: AuthUsuario!): Token
     agregarContactoUsuario(input: InputContactoUsuario!): [ContactoUsuario]
@@ -153,6 +190,9 @@ const typeDefs = gql`
     completarPracticasProfesionales: Usuario
     completarServicioSocial: Usuario
     editarUsuario(input: InputEditarUsuario!): Token
+    #Reclutador
+    nuevoReclutador(input: ReclutadorInput!): Reclutador
+    autenticarReclutador(input: AuthReclutador!): Token
   }
 `;
 
