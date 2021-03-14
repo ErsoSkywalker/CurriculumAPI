@@ -20,15 +20,28 @@ const typeDefs = gql`
     contactMethod: String
   }
 
+  input InputContactoUsuario {
+    contacto: String!
+    contactMethod: String!
+  }
+
   type TrayectoriaAcademicaUsuario {
     id: ID
     escuela: String
     ingreso: String
     egreso: String
-    nivel String
+    nivel: String
   }
 
-  type ExperienciaLaboral{
+  input InputTrayectoriaAcademicaUsuario {
+    escuela: String!
+    ingreso: String!
+    egreso: String!
+    nivel: String!
+  }
+
+  type TrayectoriaLaboralUsuario {
+    id: ID
     empresa: String
     ingreso: String
     egreso: String
@@ -37,12 +50,16 @@ const typeDefs = gql`
     permaneceTrabajando: Boolean
   }
 
-  type TrayectoriaLaboralUsuario{
-    id: ID
-    detalles: ExperienciaLaboral
+  input InputTrayectoriaLaboralUsuario {
+    empresa: String!
+    ingreso: String!
+    egreso: String!
+    puesto: String!
+    descripcionActividades: String!
+    permaneceTrabajando: Boolean!
   }
 
-  type QueryUsuario:{
+  type QueryUsuario {
     id: ID
     query: String
   }
@@ -65,12 +82,28 @@ const typeDefs = gql`
     busquedas: [QueryUsuario]
   }
 
-  input CursoInput {
-    titulo: String!
+  input InputUsuario {
+    nombre: String!
+    apellido: String!
+    email: String!
+    password: String!
+    numeroDeBoleta: Int!
+    estado: String!
+    promedio: Float!
+    carrera: String!
+    unidadAcademica: String!
+    servicioSocial: Boolean!
+    practicasProfesionales: Boolean!
   }
+
   #Query
   type Query {
-    obtenerCursos(input: CursoInput!): [Curso]
+    llenarQuery: String
+  }
+
+  #Mutation
+  type Mutation {
+    nuevoUsuario(input: InputUsuario!): Usuario
   }
 `;
 

@@ -26,7 +26,7 @@ const experienciaLaboral = new Schema(
       trim: true,
     },
     permaneceTrabajando: {
-      type: boolean,
+      type: Boolean,
       required: true,
       default: false,
     },
@@ -125,7 +125,33 @@ const UsuarioSchema = new Schema(
     ],
     trayectoriaLaboral: [
       {
-        detalles: experienciaLaboral,
+        empresa: {
+          type: String,
+          required: true,
+          trim: true,
+        },
+        ingreso: {
+          type: Date,
+          required: true,
+        },
+        egreso: {
+          type: Date,
+        },
+        puesto: {
+          type: String,
+          required: true,
+          trim: true,
+        },
+        descipcionActividades: {
+          type: String,
+          required: true,
+          trim: true,
+        },
+        permaneceTrabajando: {
+          type: Boolean,
+          required: true,
+          default: false,
+        },
       },
     ],
     skills: [
@@ -136,11 +162,11 @@ const UsuarioSchema = new Schema(
       },
     ],
     servicioSocial: {
-      type: boolean,
+      type: Boolean,
       default: false,
     },
     practicasProfesionales: {
-      type: boolean,
+      type: Boolean,
       default: false,
     },
     busquedas: [
@@ -162,7 +188,7 @@ UsuarioSchema.methods.encryptPassword = async (password) => {
   return await bcrypt.hash(password, salt);
 };
 
-UserSchema.methods.matchPassword = async function (password) {
+UsuarioSchema.methods.matchPassword = async function (password) {
   return await bcrypt.compare(password, this.password);
 };
 
