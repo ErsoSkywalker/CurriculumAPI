@@ -1,8 +1,18 @@
 const Usuario = require("./models/Usuarios");
+const jwt = require("jsonwebtoken");
+const crearToken = (usuario, secreta, expiresIn) => {
+  const { id, email, nombre, apellido, numeroDeBoleta } = usuario;
+  return jwt.sign({ id, email, nombre, apellido, numeroDeBoleta }, secreta, {
+    expiresIn,
+  });
+};
 
 const resolvers = {
   Query: {
-    llenarQuery: () => "Hola",
+    obtenerUsuario: async (_, { token }) => {
+      const usuarioId = await jwt.verify(token, process.env.SECRET);
+      return usuarioId;
+    },
   },
   Mutation: {
     nuevoUsuario: async (_, { input }) => {
@@ -42,6 +52,26 @@ const resolvers = {
       } catch (error) {
         console.log(error);
       }
+    },
+    autenticarUsuario: async (_, { input }) => {
+      const { email, password } = input;
+      const existeUsuario = await Usuario.findOne({ email });
+      if (!existeUsuario) {
+        throw new Error("El usuario no existe");
+      }
+
+      const passwordCorrecto = await existeUsuario.matchPassword(
+        password,
+        existeUsuario.password
+      );
+
+      if (!passwordCorrecto) {
+        throw new Error("Combinación incorrecta");
+      }
+
+      return {
+        token: crearToken(existeUsuario, process.env.SECRET, "24h"),
+      };
     },
   },
 };

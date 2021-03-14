@@ -1,6 +1,16 @@
 const { gql } = require("apollo-server");
 
 const typeDefs = gql`
+  #AuthUsuario
+  type Token {
+    token: String
+  }
+
+  input AuthUsuario {
+    email: String!
+    password: String!
+  }
+
   #Usuario
   enum EstadoEnum {
     REGULAR
@@ -98,12 +108,13 @@ const typeDefs = gql`
 
   #Query
   type Query {
-    llenarQuery: String
+    obtenerUsuario(token: String!): Usuario
   }
 
   #Mutation
   type Mutation {
     nuevoUsuario(input: InputUsuario!): Usuario
+    autenticarUsuario(input: AuthUsuario!): Token
   }
 `;
 
