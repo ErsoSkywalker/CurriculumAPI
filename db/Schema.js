@@ -143,6 +143,14 @@ const typeDefs = gql`
     empresa: String!
   }
 
+  input ReclutadorEditarInput {
+    nombre: String!
+    apellido: String!
+    email: String!
+    password: String!
+    passwordAntigua: String!
+  }
+
   input AuthReclutador {
     email: String!
     password: String!
@@ -197,6 +205,7 @@ const typeDefs = gql`
     completarPracticasProfesionales: Usuario
     completarServicioSocial: Usuario
     editarUsuario(input: InputEditarUsuario!): Token
+
     #Reclutador
     nuevoReclutador(input: ReclutadorInput!): Reclutador
     autenticarReclutador(input: AuthReclutador!): Token
@@ -206,6 +215,7 @@ const typeDefs = gql`
       input: ReclutadorContactoInput!
     ): [ReclutadorContacto]
     eliminarContactoReclutador(id: ID!): [ReclutadorContacto]
+    editarReclutador(input: ReclutadorEditarInput!): Token
   }
 `;
 

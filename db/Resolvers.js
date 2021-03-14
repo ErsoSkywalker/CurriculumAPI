@@ -542,6 +542,38 @@ const resolvers = {
 
       return resultado.contacto;
     },
+    editarReclutador: async (_, { input }, ctx) => {
+      const existeReclutador = await Reclutador.findById(ctx.user.id);
+      if (!existeReclutador) {
+        throw new Error("Ese reclutador no existe");
+      }
+
+      const passwordCorrecto = await existeReclutador.matchPassword(
+        input.passwordAntigua,
+        existeReclutador.password
+      );
+
+      if (!passwordCorrecto) {
+        throw new Error("Combinación incorrecta");
+      }
+
+      existeReclutador.nombre = input.nombre;
+      existeReclutador.apellido = input.apellido;
+      existeReclutador.email = input.email;
+      existeReclutador.password = existeReclutador.encryptPassword(
+        input.password
+      );
+
+      const resultado = await Reclutador.findOneAndUpdate(
+        { _id: ctx.user.id },
+        existeReclutador,
+        { new: true }
+      );
+
+      return {
+        token: crearToken(resultado, process.env.SECRET, "24h"),
+      };
+    },
   },
 };
 
