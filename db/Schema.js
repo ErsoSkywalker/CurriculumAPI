@@ -161,6 +161,46 @@ const typeDefs = gql`
     contactMethod: enumContactMethod!
   }
 
+  #Propuesta
+
+  enum EstadoPostulacion {
+    ACTIVA
+    PENDIENTE
+    DESCARTADA
+  }
+
+  enum EstadoPropuesta {
+    ABIERTA
+    CERRADA
+  }
+
+  type PropuestaPostulante {
+    id: ID
+    fechaPostulacion: String
+    estado: EstadoPostulacion
+  }
+
+  type Propuesta {
+    id: ID
+    titulo: String
+    puesto: String
+    carreras: [String]
+    sueldo: Float!
+    empresa: String
+    descripcion: String
+    reclutador: ID
+    postulantes: [PropuestaPostulante]
+    estado: EstadoPropuesta
+  }
+
+  input PropuestaInput {
+    titulo: String!
+    puesto: String!
+    carreras: [String]!
+    sueldo: Float!
+    descripcion: String!
+  }
+
   #Query
   type Query {
     #Usuario
@@ -216,6 +256,19 @@ const typeDefs = gql`
     ): [ReclutadorContacto]
     eliminarContactoReclutador(id: ID!): [ReclutadorContacto]
     editarReclutador(input: ReclutadorEditarInput!): Token
+
+    #Propuesta
+    nuevaPropuesta(input: PropuestaInput!): Propuesta
+    cambiarEstadoPropuesta(id: ID!): Propuesta
+    editarPropuesta(id: ID!, input: PropuestaInput!): Propuesta
+    cambiarEstadoPostulante(
+      id: ID!
+      idPostulante: ID!
+      estadoPostulacion: EstadoPostulacion!
+    ): Propuesta
+    #Estas dos se hacen desde el perfil del usuario
+    postularUsuario(id: ID!): String
+    retirarCandidatura(id: ID!): String
   }
 `;
 

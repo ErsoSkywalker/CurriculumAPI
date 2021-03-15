@@ -12,15 +12,12 @@ const PropuestaSchema = new Schema(
       required: true,
       trim: true,
     },
-    enfoque: [
-      {
-        carrera: {
-          type: String,
-          required: true,
-          trim: true,
-        },
-      },
-    ],
+    carreras: [{ type: String, required: true, trim: true }],
+    sueldo: {
+      type: Number,
+      required: true,
+      trim: true,
+    },
     empresa: {
       type: String,
       required: true,
@@ -32,14 +29,14 @@ const PropuestaSchema = new Schema(
       trim: true,
     },
     reclutador: {
-      type: mongoose.Schema.Types.ObjectId,
+      type: Schema.Types.ObjectId,
       ref: "reclutador",
       required: true,
     },
     postulantes: [
       {
-        usuario: {
-          type: mongoose.Schema.Types.ObjectId,
+        idUsuario: {
+          type: Schema.Types.ObjectId,
           ref: "usuario",
         },
         fechaPostulacion: {
@@ -49,11 +46,17 @@ const PropuestaSchema = new Schema(
         },
         estado: {
           type: String,
+          default: "PENDIENTE",
           required: true,
           trim: true,
         },
       },
     ],
+    estado: {
+      type: String,
+      default: "ABIERTA",
+      trim: true,
+    },
   },
   {
     timestamps: true,

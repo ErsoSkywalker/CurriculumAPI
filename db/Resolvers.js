@@ -1,5 +1,6 @@
 const Usuario = require("./models/Usuarios");
 const Reclutador = require("./models/Reclutador");
+const Propuesta = require("./models/Propuesta");
 const jwt = require("jsonwebtoken");
 const crearToken = (usuario, secreta, expiresIn) => {
   const { id, email, nombre, apellido } = usuario;
@@ -573,6 +574,178 @@ const resolvers = {
       return {
         token: crearToken(resultado, process.env.SECRET, "24h"),
       };
+    },
+    nuevaPropuesta: async (_, { input }, ctx) => {
+      const { titulo, puesto, carreras, sueldo, descripcion } = input;
+      const existeReclutador = await Reclutador.findById(ctx.user.id);
+      if (!existeReclutador) {
+        throw new Error("Ese reclutador no existe");
+      }
+      try {
+        const PropuestaGo = {
+          titulo,
+          puesto,
+          carreras,
+          sueldo,
+          descripcion,
+          reclutador: ctx.user.id,
+          empresa: existeReclutador.empresa,
+          postulantes: [],
+        };
+        const newPropuesta = new Propuesta(PropuestaGo);
+        newPropuesta.save();
+        return newPropuesta;
+      } catch (error) {
+        console.log(error);
+      }
+    },
+    cambiarEstadoPropuesta: async (_, { id }, ctx) => {
+      const existeReclutador = await Reclutador.findById(ctx.user.id);
+      if (!existeReclutador) {
+        throw new Error("Ese reclutador no existe");
+      }
+
+      const existePropuesta = await Propuesta.findById(id);
+      if (!existePropuesta) {
+        throw new Error("Tu propuesta no existe");
+      }
+
+      if (existePropuesta.reclutador != ctx.user.id) {
+        throw new Error("No tienes los permisos para hacer esto");
+      }
+
+      existePropuesta.estado =
+        existePropuesta.estado === "ABIERTA" ? "CERRADA" : "ABIERTA";
+
+      const resultado = await Propuesta.findOneAndUpdate(
+        { _id: id },
+        existePropuesta,
+        { new: true }
+      );
+      return resultado;
+    },
+    editarPropuesta: async (_, { id, input }, ctx) => {
+      const { titulo, puesto, carreras, sueldo, descripcion } = input;
+      const existeReclutador = await Reclutador.findById(ctx.user.id);
+      if (!existeReclutador) {
+        throw new Error("Ese reclutador no existe");
+      }
+
+      const existePropuesta = await Propuesta.findById(id);
+      if (!existePropuesta) {
+        throw new Error("Tu propuesta no existe");
+      }
+
+      if (existePropuesta.reclutador != ctx.user.id) {
+        throw new Error("No tienes los permisos para hacer esto");
+      }
+
+      existePropuesta.titulo = titulo;
+      existePropuesta.puesto = puesto;
+      existePropuesta.carreras = carreras;
+      existePropuesta.sueldo = sueldo;
+      existePropuesta.descripcion = descripcion;
+
+      const resultado = await Propuesta.findOneAndUpdate(
+        { _id: id },
+        existePropuesta,
+        { new: true }
+      );
+      return resultado;
+    },
+    postularUsuario: async (_, { id }, ctx) => {
+      // Acá usaremos el id de un alumno en el ctx, ya que son los que se postulan
+      const existeUsuario = await Usuario.findById(ctx.user.id);
+      if (!existeUsuario) {
+        throw new Error("Ese usuario no existe");
+      }
+
+      const existePropuesta = await Propuesta.findById(id);
+      if (!existePropuesta) {
+        throw new Error("Tu propuesta no existe");
+      }
+
+      if (existePropuesta.estado == "CERRADA") {
+        throw new Error("La propuesta está cerrada, no puedes postular");
+      }
+
+      let postuladoAntes = false;
+      for await (const postulante of existePropuesta.postulantes) {
+        if (postulante.idUsuario == ctx.user.id) {
+          postuladoAntes = true;
+        }
+      }
+
+      if (postuladoAntes) {
+        throw new Error("Hey! Ya te has registrado antes");
+      }
+
+      existePropuesta.postulantes.push({ idUsuario: ctx.user.id });
+
+      const resultado = await Propuesta.findOneAndUpdate(
+        { _id: id },
+        existePropuesta,
+        { new: true }
+      );
+
+      return "Postulado con éxito";
+    },
+    retirarCandidatura: async (_, { id }, ctx) => {
+      const existeUsuario = await Usuario.findById(ctx.user.id);
+      if (!existeUsuario) {
+        throw new Error("Ese usuario no existe");
+      }
+
+      const existePropuesta = await Propuesta.findById(id);
+      if (!existePropuesta) {
+        throw new Error("Tu propuesta no existe");
+      }
+
+      for (let i = 0; i < existePropuesta.postulantes.length; i++) {
+        if (ctx.user.id == existePropuesta.postulantes[i].idUsuario) {
+          existePropuesta.postulantes.splice(i, 1);
+        }
+      }
+
+      const resultado = await Propuesta.findOneAndUpdate(
+        { _id: id },
+        existePropuesta,
+        { new: true }
+      );
+
+      return "Eliminamos la candidatura con éxito";
+    },
+    cambiarEstadoPostulante: async (
+      _,
+      { id, idPostulante, estadoPostulacion },
+      ctx
+    ) => {
+      const existeReclutador = await Reclutador.findById(ctx.user.id);
+      if (!existeReclutador) {
+        throw new Error("Ese reclutador no existe");
+      }
+
+      const existePropuesta = await Propuesta.findById(id);
+      if (!existePropuesta) {
+        throw new Error("Tu propuesta no existe");
+      }
+
+      if (existePropuesta.reclutador != ctx.user.id) {
+        throw new Error("No tienes los permisos para hacer esto");
+      }
+
+      for await (const postulante of existePropuesta.postulantes) {
+        if (postulante.idUsuario == idPostulante) {
+          postulante.estado = estadoPostulacion;
+        }
+      }
+
+      const resultado = await Propuesta.findOneAndUpdate(
+        { _id: id },
+        existePropuesta,
+        { new: true }
+      );
+      return resultado;
     },
   },
 };
