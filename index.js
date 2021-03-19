@@ -1,6 +1,6 @@
 require("dotenv").config();
 
-const { ApolloServer, gql } = require("apollo-server");
+const { ApolloServer } = require("apollo-server");
 const jwt = require("jsonwebtoken");
 const typeDefs = require("./db/Schema");
 const resolvers = require("./db/Resolvers");
@@ -26,6 +26,6 @@ const server = new ApolloServer({
   },
 });
 
-server.listen().then(({ url }) => {
+server.listen({ port: process.env.PORT || 4000 }).then(({ url }) => {
   console.log(`Servidor escuchando en ${url}`);
 });
